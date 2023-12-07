@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Form with API Submission</title>
+
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f2f2f2;
+                margin: 20px;
+            }
+
+            h2,
+            p {
+                text-align: center;
+            }
+
+            input[type="radio"],
+            input[type="text"],
+            input[type="number"],
+            button {
+                margin: 5px;
+                padding: 10px;
+                border-radius: 5px;
+            }
+
+            #submitBtn {
+                background-color: #008cba;
+                color: white;
+                margin: 0 auto;
+                display: block; /* To center the button */
+            }
+
+            #submitBtn:hover {
+                background-color: #005a7e;
+            }
+
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+            #resultContainer {
+                margin-top: 20px;
+                text-align: left; /* Right-align the text */
+            }
+
+            #resultHeadline {
+                font-weight: bold;
+                font-size: 18px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Steam Game Recommendation</h2>
+
+            <p>함께 플레이할 사람을 선택하세요:</p>
+            <label
+                ><input
+                    type="radio"
+                    name="buttonGroup"
+                    value="Button 1"
+                />혼자서</label
+            >
+            <label
+                ><input
+                    type="radio"
+                    name="buttonGroup"
+                    value="Button 2"
+                />친구와</label
+            >
+            <label
+                ><input
+                    type="radio"
+                    name="buttonGroup"
+                    value="Button 3"
+                />연인과</label
+            >
+            <label
+                ><input
+                    type="radio"
+                    name="buttonGroup"
+                    value="Button 4"
+                />여러명과</label
+            >
+
+            <br /><br />
+
+            <p>게임 이름을 선택하세요</p>
+            <input
+                type="text"
+                id="input1"
+                placeholder="게임 이름"
+                list="searchOptions"
+            />
+            <input type="text" id="input2" list="searchOptions" />
+            <input type="text" id="input3" list="searchOptions" />
+            <datalist id="searchOptions">
+                <option value="battle ground" />
+                <option value="it take's two" />
+                <option value="portal2" />
+                <option value="counter strike2" />
+            </datalist>
+            <br /><br />
+
+            <p>플레이 시간을 입력하세요:</p>
+            <label for="integerInput1">플레이 시간:</label>
+            <input type="number" id="integerInput1" name="integerInput1" />
+            <br /><br />
+
+            <label for="integerInput2">플레이 시간:</label>
+            <input type="number" id="integerInput2" name="integerInput2" />
+            <br /><br />
+
+            <label for="integerInput3">플레이 시간:</label>
+            <input type="number" id="integerInput3" name="integerInput3" />
+
+            <br /><br />
+
+            <button id="submitBtn" onclick="submitForm()">추천 받기</button>
+            <div id="resultContainer"></div>
+        </div>
+
+        <script>
+            function submitForm() {
+                var selectedButton = document.querySelector(
+                    'input[name="buttonGroup"]:checked'
+                );
+                var buttonClicked = selectedButton ? selectedButton.value : "";
+                var input1Value = document.getElementById("input1").value;
+                var input2Value = document.getElementById("input2").value;
+                var input3Value = document.getElementById("input3").value;
+
+                var integerInput1Value =
+                    parseInt(
+                        document.getElementById("integerInput1").value,
+                        10
+                    ) || 0;
+                var integerInput2Value =
+                    parseInt(
+                        document.getElementById("integerInput2").value,
+                        10
+                    ) || 0;
+                var integerInput3Value =
+                    parseInt(
+                        document.getElementById("integerInput3").value,
+                        10
+                    ) || 0;
+
+                var formData = {
+                    buttonClicked: buttonClicked,
+                    input1: input1Value,
+                    input2: input2Value,
+                    input3: input3Value,
+                    integerInput1: integerInput1Value,
+                    integerInput2: integerInput2Value,
+                    integerInput3: integerInput3Value,
+                };
+
+                fetch("/submit", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formData),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        console.log("Success:", data);
+
+                        // Display the strings under the submit button
+                        var resultContainer =
+                            document.getElementById("resultContainer");
+                        resultContainer.innerHTML = `
+                            <p id= "resultHeadline">추천 결과</p>
+                            <p>1. ${data.game1}</p>
+                            <p>2. ${data.game2}</p>
+                            <p>3. ${data.game3}</p>
+                        `;
+                    })
+                    .catch((error) => {
+                        console.error("Error:", error);
+                        alert("Error submitting form.");
+                    });
+            }
+        </script>
+    </body>
+</html>
